@@ -1,0 +1,328 @@
+import React, { useState, useEffect } from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+
+export default function GuineaPigTracker() {
+  const [data, setData] = useState([]);
+  const [newEntry, setNewEntry] = useState({
+    date: new Date().toISOString().split('T')[0],
+    Merlin: '',
+    Jazz: '',
+    Nord: '',
+    Bo: ''
+  });
+
+  useEffect(() => {
+    const saved = localStorage.getItem('gpData');
+    if (saved) {
+      setData(JSON.parse(saved));
+    }
+  }, []);
+
+  const saveData = (newData) => {
+    localStorage.setItem('gpData', JSON.stringify(newData));
+    setData(newData);
+  };
+
+  const addEntry = () => {
+    const entry = {
+      date: newEntry.date,
+      Merlin: parseFloat(newEntry.Merlin) || null,
+      Jazz: parseFloat(newEntry.Jazz) || null,
+      Nord: parseFloat(newEntry.Nord) || null,
+      Bo: parseFloat(newEntry.Bo) || null
+    };
+    
+    const updated = [...data, entry].sort((a, b) => new Date(a.date) - new Date(b.date));
+    saveData(updated);
+    
+    setNewEntry({
+      date: new Date().toISOString().split('T')[0],
+      Merlin: '',
+      Jazz: '',
+      Nord: '',
+      Bo: ''
+    });
+  };
+
+  const deleteEntry = (index) => {
+    const updated = data.filter((_, i) => i !== index);
+    saveData(updated);
+  };
+
+  const importCSV = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target.result;
+      const lines = text.split('\n').slice(1); // Skip first row (title)
+      
+      const imported = lines
+        .map(line => {
+          const parts = line.split(';');
+          if (parts.length >= 5 && parts[0].trim()) {
+            return {
+              date: parts[0].trim(),
+              Merlin: parseFloat(parts[1]) || null,
+              Jazz: parseFloat(parts[2]) || null,
+              Nord: parseFloat(parts[3]) || null,
+              Bo: parseFloat(parts[4]) || null
+            };
+          }
+          return null;
+        })
+        .filter(entry => entry !== null);
+
+      const merged = [...data, ...imported]
+        .filter((entry, index, self) => 
+          index === self.findIndex(e => e.date === entry.date)
+        )
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+      
+      saveData(merged);
+      alert(`Imported ${imported.length} entries!`);
+    };
+    reader.readAsText(file);
+  };
+
+  const exportCSV = () => {
+    const csvContent = 'Date;Merlin;Jazz;Nord;Bo\n' + 
+      data.map(entry => 
+        `${entry.date};${entry.Merlin || ''};${entry.Jazz || ''};${entry.Nord || ''};${entry.Bo || ''}`
+      ).join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'guinea_pig_data.csv';
+    a.click();
+  };
+
+  const colors = {
+    Merlin: '#00FF41',
+    Jazz: '#39FF14',
+    Nord: '#00D9FF',
+    Bo: '#0FFF50'
+  };
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: '#000000',
+      color: '#00FF41',
+      fontFamily: "'Courier New', monospace",
+      padding: '20px'
+    }}>
+      <div style={{
+        maxWidth: '1400px',
+        margin: '0 auto',
+        border: '3px solid #00FF41',
+        boxShadow: '0 0 30px rgba(0, 255, 65, 0.5)',
+        padding: '20px',
+        background: '#000000'
+      }}>
+        <h1 style={{
+          textAlign: 'center',
+          fontSize: '28px',
+          marginTop: 0,
+          color: '#00FF41'
+        }}>
+          GGWM — Guinea Gang Weight Monitor
+        </h1>
+
+        {/* Import/Export Buttons */}
+        <div style={{
+          background: '#0D0208',
+          border: '2px solid #00FF41',
+          padding: '15px',
+          marginBottom: '20px',
+          display: 'flex',
+          gap: '10px',
+          alignItems: 'center'
+        }}>
+          <h3 style={{ margin: 0, color: '#39FF14', flexGrow: 1 }}>[ DATA MANAGEMENT ]</h3>
+          <label style={{
+            padding: '8px 16px',
+            background: '#00D9FF',
+            color: '#000',
+            fontFamily: "'Courier New', monospace",
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            border: 'none'
+          }}>
+            IMPORT CSV
+            <input
+              type="file"
+              accept=".csv"
+              onChange={importCSV}
+              style={{ display: 'none' }}
+            />
+          </label>
+          {data.length > 0 && (
+            <button
+              onClick={exportCSV}
+              style={{
+                padding: '8px 16px',
+                background: '#0FFF50',
+                color: '#000',
+                fontFamily: "'Courier New', monospace",
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                border: 'none'
+              }}
+            >
+              EXPORT CSV
+            </button>
+          )}
+        </div>
+
+        {/* Input Form */}
+        <div style={{
+          background: '#0D0208',
+          border: '2px solid #00FF41',
+          padding: '20px',
+          marginBottom: '20px'
+        }}>
+          <h3 style={{ marginTop: 0, color: '#39FF14' }}>[ ADD NEW MEASUREMENT ]</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px' }}>Date</label>
+              <input
+                type="date"
+                value={newEntry.date}
+                onChange={(e) => setNewEntry({...newEntry, date: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  background: '#000',
+                  border: '2px solid #00FF41',
+                  color: '#00FF41',
+                  fontFamily: "'Courier New', monospace"
+                }}
+              />
+            </div>
+            {['Merlin', 'Jazz', 'Nord', 'Bo'].map(pig => (
+              <div key={pig}>
+                <label style={{ display: 'block', marginBottom: '5px' }}>{pig} (g)</label>
+                <input
+                  type="number"
+                  value={newEntry[pig]}
+                  onChange={(e) => setNewEntry({...newEntry, [pig]: e.target.value})}
+                  placeholder="weight"
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    background: '#000',
+                    border: '2px solid #00FF41',
+                    color: '#00FF41',
+                    fontFamily: "'Courier New', monospace"
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+          <button
+            onClick={addEntry}
+            style={{
+              marginTop: '15px',
+              padding: '10px 20px',
+              background: '#00FF41',
+              border: 'none',
+              color: '#000',
+              fontFamily: "'Courier New', monospace",
+              fontSize: '14px',
+              fontWeight: 'bold',
+              cursor: 'pointer'
+            }}
+          >
+            ADD ENTRY
+          </button>
+        </div>
+
+        {/* Chart */}
+        {data.length > 0 && (
+          <div style={{
+            background: '#0D0208',
+            border: '2px solid #00FF41',
+            padding: '20px',
+            marginBottom: '20px'
+          }}>
+            <ResponsiveContainer width="100%" height={400}>
+              <LineChart data={data}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1a4d2e" />
+                <XAxis dataKey="date" stroke="#00FF41" />
+                <YAxis stroke="#00FF41" label={{ value: 'Weight (g)', angle: -90, position: 'insideLeft', fill: '#00FF41' }} />
+                <Tooltip 
+                  contentStyle={{ 
+                    background: '#000', 
+                    border: '2px solid #00FF41',
+                    fontFamily: "'Courier New', monospace",
+                    color: '#00FF41'
+                  }}
+                />
+                <Legend />
+                <Line type="monotone" dataKey="Merlin" stroke={colors.Merlin} strokeWidth={3} dot={{ r: 5 }} />
+                <Line type="monotone" dataKey="Jazz" stroke={colors.Jazz} strokeWidth={3} dot={{ r: 5 }} />
+                <Line type="monotone" dataKey="Nord" stroke={colors.Nord} strokeWidth={3} dot={{ r: 5 }} />
+                <Line type="monotone" dataKey="Bo" stroke={colors.Bo} strokeWidth={3} dot={{ r: 5 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {/* Data Table */}
+        {data.length > 0 && (
+          <div style={{
+            background: '#0D0208',
+            border: '2px solid #00FF41',
+            padding: '20px'
+          }}>
+            <h3 style={{ marginTop: 0, color: '#39FF14' }}>[ DATA LOG ]</h3>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr>
+                    <th style={{ border: '1px solid #00FF41', padding: '8px' }}>Date</th>
+                    <th style={{ border: '1px solid #00FF41', padding: '8px' }}>Merlin</th>
+                    <th style={{ border: '1px solid #00FF41', padding: '8px' }}>Jazz</th>
+                    <th style={{ border: '1px solid #00FF41', padding: '8px' }}>Nord</th>
+                    <th style={{ border: '1px solid #00FF41', padding: '8px' }}>Bo</th>
+                    <th style={{ border: '1px solid #00FF41', padding: '8px' }}>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.map((entry, idx) => (
+                    <tr key={idx}>
+                      <td style={{ border: '1px solid #00FF41', padding: '8px' }}>{entry.date}</td>
+                      <td style={{ border: '1px solid #00FF41', padding: '8px' }}>{entry.Merlin || '-'}</td>
+                      <td style={{ border: '1px solid #00FF41', padding: '8px' }}>{entry.Jazz || '-'}</td>
+                      <td style={{ border: '1px solid #00FF41', padding: '8px' }}>{entry.Nord || '-'}</td>
+                      <td style={{ border: '1px solid #00FF41', padding: '8px' }}>{entry.Bo || '-'}</td>
+                      <td style={{ border: '1px solid #00FF41', padding: '8px' }}>
+                        <button
+                          onClick={() => deleteEntry(idx)}
+                          style={{
+                            padding: '4px 8px',
+                            background: '#CC3311',
+                            border: 'none',
+                            color: '#fff',
+                            cursor: 'pointer',
+                            fontFamily: "'Courier New', monospace"
+                          }}
+                        >
+                          DELETE
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
