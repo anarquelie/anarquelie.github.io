@@ -287,6 +287,31 @@
     .empty.visible { display: block; }
     .loader { text-align: center; padding: 2rem; color: var(--muted); font-size: .9rem; }
 
+
+    @media (max-width: 480px) {
+      .card { padding: 1rem; gap: .6rem; min-height: 80px; }
+      .card-icon { display: none; }
+      .card-body { display: flex; flex-direction: row; align-items: center; gap: .4rem; flex-wrap: nowrap; }
+      .card-body h3 { font-size: .95rem; white-space: nowrap; }
+      .card-body .card-type { display: none; }
+      .card-aside { flex-direction: column; align-items: flex-end; gap: .25rem; }
+      .badge { font-size: .6rem; padding: 3px 8px; }
+      .badge-vitc { font-size: .68rem; }
+    }
+
+
+    @media (min-width: 481px) {
+      .card-body h3 .emoji { display: none; }
+    }
+
+
+    .name-short { display: none; }
+    .name-full  { display: inline; }
+    @media (max-width: 480px) {
+      .name-short { display: inline; }
+      .name-full  { display: none; }
+    }
+
     @keyframes float {
       0%, 100% { transform: translateY(0); }
       50%       { transform: translateY(-8px); }
@@ -373,6 +398,11 @@ fetch('foods.json')
   .then(r => r.json())
   .then(foods => {
 
+    function truncate(name, max) {
+      return name.length > max ? name.slice(0, max).trimEnd() + '…' : name;
+    }
+    const MAX_NAME = 12;
+
     foods.forEach(f => {
       const opt = document.createElement('option');
       opt.value = f.name.charAt(0).toUpperCase() + f.name.slice(1);
@@ -391,7 +421,7 @@ fetch('foods.json')
       el.innerHTML = `
         <div class="card-icon">${f.emoji}</div>
         <div class="card-body">
-          <h3>${f.name}</h3>
+          <h3><span class="name-short">${truncate(f.name, MAX_NAME)}</span><span class="name-full">${f.name}</span> <span class="emoji">${f.emoji}</span></h3>
           <p class="card-type">${typeLabel}</p>
         </div>
         <div class="card-aside">
