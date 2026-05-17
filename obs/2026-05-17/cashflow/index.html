@@ -1,0 +1,2519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cashflow Manager</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="icons/48.png">
+    
+    <!-- iOS Home Screen Icons -->
+    <link rel="apple-touch-icon" sizes="120x120" href="icons/120.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icons/152.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="icons/167.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/180.png">
+    <link rel="apple-touch-icon" sizes="1024x1024" href="icons/1024.png">
+    
+    <!-- iOS Web App Configuration -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Cashflow">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .setup-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .setup-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .setup-steps {
+            color: #666;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .setup-steps ol {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .setup-steps li {
+            margin-bottom: 8px;
+        }
+
+        .setup-steps code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        .auth-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .balance-display {
+            text-align: center;
+        }
+
+        .balance-label {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .balance-amount {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .balance-amount.negative {
+            color: #e74c3c;
+        }
+
+        .balance-secondary {
+            font-size: 14px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .balance-row {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .balance-item {
+            text-align: center;
+        }
+
+        .balance-item-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 3px;
+        }
+
+        .balance-item-value {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .balance-item-value.available {
+            color: #27ae60;
+        }
+
+        .balance-item-value.pending {
+            color: #f39c12;
+        }
+
+        .sync-status {
+            background: white;
+            text-align: center;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .sync-status.synced {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .sync-status.syncing {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .sync-status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .form-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .form-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        label .required {
+            color: #e74c3c;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+            max-width: 100%;
+        }
+
+        input[type="date"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .amount-input-group {
+            position: relative;
+        }
+
+        .amount-input-group input {
+            padding-right: 40px;
+        }
+
+        .currency-symbol {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-weight: 600;
+        }
+
+        .transaction-list {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .list-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .transaction-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .transaction-item:hover {
+            background: #f9f9f9;
+            padding: 15px 10px;
+            margin: 0 -10px;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-info {
+            flex: 1;
+        }
+
+        .transaction-event {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .transaction-date {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .transaction-comment {
+            font-size: 13px;
+            color: #666;
+            margin-top: 3px;
+        }
+
+        .transaction-status {
+            margin-left: 5px;
+        }
+
+        .transaction-amount {
+            font-weight: bold;
+            font-size: 16px;
+            white-space: nowrap;
+            margin-left: 10px;
+            text-align: right;
+        }
+
+        .transaction-amount.positive {
+            color: #27ae60;
+        }
+
+        .transaction-amount.negative {
+            color: #e74c3c;
+        }
+
+        .transaction-balance {
+            font-size: 12px;
+            color: #999;
+            text-align: right;
+            margin-top: 3px;
+        }
+        
+        .transaction-right {
+            min-width: 100px;
+            text-align: right;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+                padding-bottom: 80px;
+            }
+
+            .balance-amount {
+                font-size: 28px;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+            
+            #expenseChart {
+                width: 100% !important;
+                height: auto !important;
+                max-width: 350px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Setup Instructions (shown only if not connected) -->
+        <div class="setup-card" id="setupCard">
+            <div class="setup-title">📋 Google Apps Script Setup</div>
+            <div class="setup-steps">
+                <p><strong>Follow these steps to connect:</strong></p>
+                <ol>
+                    <li>Your Google Sheet should have columns: <code>Date | Event | Amount | Category | Completed | Comment</code></li>
+                    <li>Open your sheet → <strong>Extensions → Apps Script</strong></li>
+                    <li>Copy the script from the setup guide</li>
+                    <li>Deploy as Web App (Execute as: Me, Access: Anyone)</li>
+                    <li>Copy the deployment URL and paste it below</li>
+                </ol>
+                <p style="margin-top: 10px; font-size: 13px; color: #999;">
+                    <strong>URL format:</strong> https://script.google.com/macros/s/ABC.../exec
+                </p>
+                <p style="margin-top: 10px; font-size: 13px; color: #e74c3c;">
+                    <strong>⚠️ IMPORTANT:</strong> Add a new "Category" column (column D) after Amount!
+                </p>
+            </div>
+            <div class="auth-section">
+                <div class="form-group">
+                    <label>Apps Script URL <span class="required">*</span></label>
+                    <input type="text" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/...">
+                </div>
+                <button class="btn btn-success" onclick="connectSheet()">Connect to Google Sheet</button>
+            </div>
+        </div>
+
+        <!-- Main App (shown after connection) -->
+        <div id="mainApp" class="hidden">
+            <!-- Sync Status -->
+            <div class="sync-status synced" id="syncStatus">
+                ✓ Synced with Google Sheets
+            </div>
+            
+            <!-- Balance Display -->
+            <div class="header">
+                <div class="balance-display">
+                    <div class="balance-label" id="balanceDateLabel" style="text-align: center;">My money</div>
+                    <div class="balance-amount" id="myMoneyBalance" onclick="showMyMoneyExplanation()" style="cursor: pointer;">€0.00</div>
+                    
+                    <div class="balance-row">
+                        <div class="balance-item" onclick="showAvailableExplanation()" style="cursor: pointer;">
+                            <div class="balance-item-label">Available in account(s)</div>
+                            <div class="balance-item-value" id="availableAmount">€0.00</div>
+                        </div>
+                        <div class="balance-item" onclick="showNextMonthExplanation()" style="cursor: pointer;">
+                            <div class="balance-item-label">Available next month</div>
+                            <div class="balance-item-value" id="afterDebitBalance">€0.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div style="display: flex; justify-content: center; gap: 15px; margin: 20px 0;">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                    <button onclick="showCashflow()" id="cashflowBtn" style="width: 50px; height: 50px; border-radius: 50%; background: white; border: none; font-size: 24px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.2s; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'; this.style.transform='translateY(0)';" title="Trends">📈</button>
+                    <span style="font-size: 11px; color: white;">Trends</span>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                    <button onclick="showDebt()" id="debtBtn" style="width: 50px; height: 50px; border-radius: 50%; background: white; border: none; font-size: 24px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.2s; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'; this.style.transform='translateY(0)';" title="Debt evolution">💀</button>
+                    <span style="font-size: 11px; color: white;">Debt</span>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                    <button onclick="showRealMoney()" id="realMoneyBtn" style="width: 50px; height: 50px; border-radius: 50%; background: white; border: none; font-size: 24px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.2s; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'; this.style.transform='translateY(0)';" title="Real money evolution">💰</button>
+                    <span style="font-size: 11px; color: white;">Real money</span>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                    <button onclick="toggleStatistics()" id="statsBtn" style="width: 50px; height: 50px; border-radius: 50%; background: white; border: none; font-size: 24px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.2s; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'; this.style.transform='translateY(0)';" title="Expenses">📊</button>
+                    <span style="font-size: 11px; color: white;">Expenses</span>
+                </div>
+            </div>
+
+            <!-- Add Transaction Form -->
+            <div class="form-card hidden" id="transactionForm">
+                <div class="form-title">New transaction</div>
+                <form id="addForm" onsubmit="addTransaction(event)">
+                    <!-- Row 1: Event name (full width) -->
+                    <div class="form-group">
+                        <label>Event <span class="required">*</span></label>
+                        <input type="text" id="eventInput" placeholder="e.g., Groceries, Salary..." required style="padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                    </div>
+                    
+                    <!-- Row 2: Type buttons (full width) -->
+                    <div class="form-group">
+                        <label>Type</label>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="button" class="btn btn-secondary" id="expenseBtn" onclick="setTransactionType('expense')" style="flex: 1; border: 2px solid #e74c3c; background: white; color: #e74c3c; font-weight: 600;">
+                                Expense
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="incomeBtn" onclick="setTransactionType('income')" style="flex: 1; border: 2px solid #27ae60; background: white; color: #27ae60; font-weight: 600;">
+                                Income
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Row 3: Amount and Date side by side -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="form-group" style="margin: 0;">
+                            <label>Amount <span class="required">*</span></label>
+                            <input type="text" id="amountInput" placeholder="50.00" required style="padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; height: 44px;">
+                        </div>
+                        
+                        <div class="form-group" style="margin: 0;">
+                            <label>Date</label>
+                            <input type="date" id="dateInput" required style="padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; height: 44px;">
+                        </div>
+                    </div>
+                    
+                    <!-- Row 4: Status and Category side by side -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px;">
+                        <div class="form-group" style="margin: 0;">
+                            <label>Status</label>
+                            <select id="statusInput" style="padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                                <option value="✅">✅ Completed</option>
+                                <option value="⏳">⏳ Expected</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group" style="margin: 0;">
+                            <label>Category</label>
+                            <select id="categoryInput" style="padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                                <option value="auto">Auto-detect</option>
+                                <option value="Living">🏠 Living</option>
+                                <option value="Food">🥕 Food</option>
+                                <option value="Services">💳 Services</option>
+                                <option value="Social">🍻 Social</option>
+                                <option value="Well-being">💆 Well-being</option>
+                                <option value="Pets">🐹 Pets</option>
+                                <option value="Other">🧾 Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Row 5: Comment and Multiple dates (collapsible) -->
+                    <div class="form-group">
+                        <div style="margin-top: 15px;">
+                            <div style="text-align: center; margin-bottom: 15px;">
+                                <span onclick="toggleExtraFields()" id="extraFieldsToggle" style="cursor: pointer; color: #667eea; font-size: 14px; text-decoration: none; border-bottom: 1px dashed #667eea; padding-bottom: 2px;">
+                                    Add comment or multiple dates
+                                </span>
+                            </div>
+                            <div id="extraFieldsContainer" style="display: none;">
+                                <div style="padding: 10px; background: #f9f9f9; border-radius: 8px;">
+                                    <label style="font-size: 13px; color: #666;">Comment</label>
+                                    <textarea id="commentInput" placeholder="Optional notes..." style="padding: 8px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px;"></textarea>
+                                    
+                                    <label style="font-size: 13px; color: #666;">Multiple dates</label>
+                                    <button type="button" class="btn btn-primary" onclick="openMultiDateSelector()" style="width: 100%; padding: 10px; margin-top: 5px;">
+                                        📅 Select Multiple Dates
+                                    </button>
+                                    <div id="selectedDatesDisplay" style="margin-top: 8px; font-size: 12px; color: #666;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="controls" style="margin-top: 20px;">
+                        <button type="submit" class="btn btn-primary" id="saveBtn">Save</button>
+                        <button type="button" class="btn btn-secondary" onclick="toggleForm()">Cancel</button>
+                        <button type="button" class="btn btn-danger hidden" id="deleteBtn" onclick="deleteTransaction()">🗑️ Delete</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Transaction List -->
+            <div class="transaction-list" id="transactionListContainer">
+                <div class="list-header">
+                    <button class="btn btn-secondary" style="flex: none; font-size: 12px; padding: 10px 12px;" onclick="toggleFutureTransactions()" id="futureToggleBtn">
+                        Show future (<span id="futureCount">0</span>)
+                    </button>
+                    <button class="btn btn-primary" style="flex: none; font-size: 12px; padding: 10px 12px;" onclick="toggleForm()">Add transaction</button>
+                </div>
+                <div id="transactionsList">
+                    <div class="empty-state">Loading from Google Sheets...</div>
+                </div>
+            </div>
+
+            <!-- Statistics View (hidden by default) -->
+            <div class="transaction-list hidden" id="statisticsContainer">
+                <div class="list-header">
+                    <div class="list-title">Expense statistics</div>
+                    <button class="btn btn-secondary" style="flex: none; font-size: 12px; padding: 10px 12px;" onclick="toggleStatsPeriod()" id="statsPeriodBtn">
+                        This month
+                    </button>
+                </div>
+                <div style="padding: 5px 0 20px 0;">
+                    <div style="display: flex; justify-content: center; margin: 0; overflow: hidden;">
+                        <canvas id="expenseChart" width="800" height="800" style="max-width: 100%; max-height: 400px; width: 400px; height: 400px;"></canvas>
+                    </div>
+                    <div id="categoryBreakdown"></div>
+                </div>
+            </div>
+
+            <!-- DD Tracking View (hidden by default) -->
+            <div class="transaction-list hidden" id="ddTrackingContainer">
+                <div class="list-header">
+                    <div class="list-title" id="ddTitle">Chart</div>
+                </div>
+                <div style="padding: 0;">
+                    <div style="position: relative; width: 100%; height: 0; padding-bottom: 100%;">
+                        <canvas id="ddChart" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></canvas>
+                        <canvas id="incomeSpendingChart" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Income vs Spending View removed - now part of DD tracking -->
+        </div>
+        
+        <!-- Multi-Date Selector Modal -->
+        <div id="multiDateModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center;">
+            <div style="background: white; border-radius: 15px; padding: 20px; max-width: 400px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="margin: 0; font-size: 18px;">Select Multiple Dates</h3>
+                    <button onclick="closeMultiDateSelector()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #999;">&times;</button>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <input type="date" id="multiDatePicker" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                    <button type="button" class="btn btn-primary" onclick="addDateToSelection()" style="width: 100%; margin-top: 8px;">Add Date</button>
+                </div>
+                <div id="selectedDatesList" style="max-height: 200px; overflow-y: auto; margin-bottom: 15px;"></div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeMultiDateSelector()" style="flex: 1;">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="applyMultipleDates()" style="flex: 1;">Apply</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let scriptUrl = null;
+        let transactions = [];
+        let showFuture = false;
+        let editingTransactionId = null;
+        let selectedMultipleDates = [];
+        let showingStatistics = false;
+        let showingDDTracking = false;
+        let showingIncomeSpending = false;
+        let moneyViewMode = 'incomeSpending'; // 'debt', 'realMoney', 'incomeSpending' - start with Cashflow
+        let transactionType = 'expense'; // Default to expense
+        let showingMyMoney = false;
+        let chartInstance = null;
+        let statsPeriod = 'thisMonth';
+
+        function showCashflow() {
+            const listContainer = document.getElementById('transactionListContainer');
+            const statsContainer = document.getElementById('statisticsContainer');
+            const ddContainer = document.getElementById('ddTrackingContainer');
+            const title = document.getElementById('ddTitle');
+            const ddCanvas = document.getElementById('ddChart');
+            const incomeSpendingCanvas = document.getElementById('incomeSpendingChart');
+            const cashflowBtn = document.getElementById('cashflowBtn');
+            const debtBtn = document.getElementById('debtBtn');
+            const realMoneyBtn = document.getElementById('realMoneyBtn');
+            const statsBtn = document.getElementById('statsBtn');
+            
+            // If already showing (button is 🏠), go home
+            if (cashflowBtn.textContent === '🏠') {
+                listContainer.classList.remove('hidden');
+                statsContainer.classList.add('hidden');
+                ddContainer.classList.add('hidden');
+                
+                cashflowBtn.textContent = '📈';
+                debtBtn.textContent = '💀';
+                realMoneyBtn.textContent = '💰';
+                statsBtn.textContent = '📊';
+                
+                showingDDTracking = false;
+                showingStatistics = false;
+                return;
+            }
+            
+            listContainer.classList.add('hidden');
+            statsContainer.classList.add('hidden');
+            ddContainer.classList.remove('hidden');
+            
+            title.textContent = 'Trends';
+            ddCanvas.style.display = 'none';
+            incomeSpendingCanvas.style.display = 'block';
+            
+            // Update button states
+            cashflowBtn.textContent = '🏠';
+            debtBtn.textContent = '💀';
+            realMoneyBtn.textContent = '💰';
+            statsBtn.textContent = '📊';
+            
+            showingDDTracking = true;
+            showingStatistics = false;
+            moneyViewMode = 'incomeSpending';
+            showingMyMoney = false;
+            
+            renderIncomeSpending();
+        }
+
+        function showDebt() {
+            const listContainer = document.getElementById('transactionListContainer');
+            const statsContainer = document.getElementById('statisticsContainer');
+            const ddContainer = document.getElementById('ddTrackingContainer');
+            const title = document.getElementById('ddTitle');
+            const ddCanvas = document.getElementById('ddChart');
+            const incomeSpendingCanvas = document.getElementById('incomeSpendingChart');
+            const cashflowBtn = document.getElementById('cashflowBtn');
+            const debtBtn = document.getElementById('debtBtn');
+            const realMoneyBtn = document.getElementById('realMoneyBtn');
+            const statsBtn = document.getElementById('statsBtn');
+            
+            // If already showing (button is 🏠), go home
+            if (debtBtn.textContent === '🏠') {
+                listContainer.classList.remove('hidden');
+                statsContainer.classList.add('hidden');
+                ddContainer.classList.add('hidden');
+                
+                cashflowBtn.textContent = '📈';
+                debtBtn.textContent = '💀';
+                realMoneyBtn.textContent = '💰';
+                statsBtn.textContent = '📊';
+                
+                showingDDTracking = false;
+                showingStatistics = false;
+                return;
+            }
+            
+            listContainer.classList.add('hidden');
+            statsContainer.classList.add('hidden');
+            ddContainer.classList.remove('hidden');
+            
+            title.textContent = 'Debt evolution';
+            ddCanvas.style.display = 'block';
+            incomeSpendingCanvas.style.display = 'none';
+            
+            // Update button states
+            cashflowBtn.textContent = '📈';
+            debtBtn.textContent = '🏠';
+            realMoneyBtn.textContent = '💰';
+            statsBtn.textContent = '📊';
+            
+            showingDDTracking = true;
+            showingStatistics = false;
+            moneyViewMode = 'debt';
+            showingMyMoney = false;
+            
+            renderDDTracking();
+        }
+
+        function showRealMoney() {
+            const listContainer = document.getElementById('transactionListContainer');
+            const statsContainer = document.getElementById('statisticsContainer');
+            const ddContainer = document.getElementById('ddTrackingContainer');
+            const title = document.getElementById('ddTitle');
+            const ddCanvas = document.getElementById('ddChart');
+            const incomeSpendingCanvas = document.getElementById('incomeSpendingChart');
+            const cashflowBtn = document.getElementById('cashflowBtn');
+            const debtBtn = document.getElementById('debtBtn');
+            const realMoneyBtn = document.getElementById('realMoneyBtn');
+            const statsBtn = document.getElementById('statsBtn');
+            
+            // If already showing (button is 🏠), go home
+            if (realMoneyBtn.textContent === '🏠') {
+                listContainer.classList.remove('hidden');
+                statsContainer.classList.add('hidden');
+                ddContainer.classList.add('hidden');
+                
+                cashflowBtn.textContent = '📈';
+                debtBtn.textContent = '💀';
+                realMoneyBtn.textContent = '💰';
+                statsBtn.textContent = '📊';
+                
+                showingDDTracking = false;
+                showingStatistics = false;
+                return;
+            }
+            
+            listContainer.classList.add('hidden');
+            statsContainer.classList.add('hidden');
+            ddContainer.classList.remove('hidden');
+            
+            title.textContent = 'Real money evolution';
+            ddCanvas.style.display = 'block';
+            incomeSpendingCanvas.style.display = 'none';
+            
+            // Update button states
+            cashflowBtn.textContent = '📈';
+            debtBtn.textContent = '💀';
+            realMoneyBtn.textContent = '🏠';
+            statsBtn.textContent = '📊';
+            
+            showingDDTracking = true;
+            showingStatistics = false;
+            moneyViewMode = 'realMoney';
+            showingMyMoney = true;
+            
+            renderDDTracking();
+        }
+
+
+        function setTransactionType(type) {
+            transactionType = type;
+            const expenseBtn = document.getElementById('expenseBtn');
+            const incomeBtn = document.getElementById('incomeBtn');
+            
+            if (type === 'expense') {
+                // Expense selected - red border filled, green border empty
+                expenseBtn.style.background = '#e74c3c';
+                expenseBtn.style.color = 'white';
+                expenseBtn.style.border = '2px solid #e74c3c';
+                incomeBtn.style.background = 'white';
+                incomeBtn.style.color = '#27ae60';
+                incomeBtn.style.border = '2px solid #27ae60';
+            } else {
+                // Income selected - green border filled, red border empty
+                incomeBtn.style.background = '#27ae60';
+                incomeBtn.style.color = 'white';
+                incomeBtn.style.border = '2px solid #27ae60';
+                expenseBtn.style.background = 'white';
+                expenseBtn.style.color = '#e74c3c';
+                expenseBtn.style.border = '2px solid #e74c3c';
+            }
+        }
+
+        function toggleStatsPeriod() {
+            if (statsPeriod === 'thisMonth') {
+                statsPeriod = 'nextMonth';
+            } else if (statsPeriod === 'nextMonth') {
+                statsPeriod = 'allTime';
+            } else {
+                statsPeriod = 'thisMonth';
+            }
+            
+            const btn = document.getElementById('statsPeriodBtn');
+            if (statsPeriod === 'thisMonth') {
+                btn.textContent = 'This month';
+            } else if (statsPeriod === 'nextMonth') {
+                btn.textContent = 'Next month';
+            } else {
+                btn.textContent = 'All time';
+            }
+            
+            renderStatistics();
+        }
+
+        function renderDDTracking() {
+            // Determine which data to show
+            const dataType = showingMyMoney ? 'myMoney' : 'dd';
+            
+            // Get DD transactions grouped by month
+            const ddByMonth = {};
+            const realMoneyByMonth = {};
+            
+            transactions.forEach(t => {
+                if (t.comment && t.comment.toUpperCase().includes('DD')) {
+                    const date = new Date(t.date);
+                    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                    
+                    if (!ddByMonth[monthKey]) {
+                        ddByMonth[monthKey] = 0;
+                    }
+                    ddByMonth[monthKey] += Math.abs(t.amount);
+                }
+            });
+            
+            // Calculate Real Money for each month
+            const sortedMonths = Object.keys(ddByMonth).sort().slice(-6);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            sortedMonths.forEach(monthKey => {
+                const [year, month] = monthKey.split('-');
+                const monthStart = new Date(year, month - 1, 1);
+                const monthEnd = new Date(year, month, 0);
+                
+                const currentMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+                const cutoffDate = (monthKey === currentMonth) ? today : monthEnd;
+                
+                let balance = 0;
+                let salaryInMonth = 0;
+                
+                transactions.forEach(t => {
+                    const tDate = new Date(t.date);
+                    if (tDate <= cutoffDate && t.status === '✅') {
+                        balance += t.amount;
+                        if (tDate >= monthStart && tDate <= cutoffDate && t.amount > 0) {
+                            salaryInMonth += t.amount;
+                        }
+                    }
+                });
+                
+                const nextMonthKey = getNextMonthKey(monthKey);
+                const nextMonthDD = ddByMonth[nextMonthKey] || 0;
+                
+                let nextMonthLiving = 0;
+                let nextMonthServices = 0;
+                
+                transactions.forEach(t => {
+                    const tDate = new Date(t.date);
+                    const tMonthKey = `${tDate.getFullYear()}-${String(tDate.getMonth() + 1).padStart(2, '0')}`;
+                    if (tMonthKey === nextMonthKey) {
+                        const category = categorizeTransaction(t.event, t.amount, t.comment, t.category);
+                        if (category === 'Living') nextMonthLiving += t.amount;
+                        if (category === 'Services') nextMonthServices += t.amount;
+                    }
+                });
+                
+                realMoneyByMonth[monthKey] = balance + nextMonthDD + nextMonthLiving + nextMonthServices - salaryInMonth;
+            });
+            
+            const amounts = showingMyMoney ? sortedMonths.map(m => realMoneyByMonth[m] || 0) : sortedMonths.map(m => ddByMonth[m]);
+            const labels = sortedMonths.map(m => {
+                const [year, month] = m.split('-');
+                const date = new Date(year, month - 1);
+                return date.toLocaleDateString('en-US', { month: 'short' });
+            });
+            
+            // Setup canvas for high DPI
+            const canvas = document.getElementById('ddChart');
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            
+            const width = rect.width;
+            const height = rect.height;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            if (amounts.length === 0) {
+                ctx.font = '16px sans-serif';
+                ctx.fillStyle = '#999';
+                ctx.textAlign = 'center';
+                ctx.fillText('No data available', width / 2, height / 2);
+                return;
+            }
+            
+            const paddingLeft = 60;
+            const paddingRight = 20;
+            const paddingTop = 20;
+            const paddingBottom = 50;
+            const chartWidth = width - paddingLeft - paddingRight;
+            const chartHeight = height - paddingTop - paddingBottom;
+            
+            // Find max and min (My Money can be negative)
+            const rawMax = Math.max(...amounts.map(Math.abs));
+            const maxAmount = Math.ceil(rawMax / 100) * 100;
+            const rawMin = showingMyMoney ? Math.min(0, ...amounts) : 0;
+            const minAmount = Math.floor(rawMin / 100) * 100;
+            const range = maxAmount - minAmount;
+            
+            // Determine step size
+            let stepSize = 200;
+            if (range > 2000) stepSize = 500;
+            if (range > 5000) stepSize = 1000;
+            
+            // Draw axes
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(paddingLeft, paddingTop);
+            ctx.lineTo(paddingLeft, height - paddingBottom);
+            ctx.lineTo(width - paddingRight, height - paddingBottom);
+            ctx.stroke();
+            
+            // Draw grid lines and Y labels
+            for (let value = minAmount; value <= maxAmount; value += stepSize) {
+                const y = height - paddingBottom - ((value - minAmount) / range) * chartHeight;
+                
+                ctx.strokeStyle = '#f0f0f0';
+                ctx.beginPath();
+                ctx.moveTo(paddingLeft, y);
+                ctx.lineTo(width - paddingRight, y);
+                ctx.stroke();
+                
+                ctx.fillStyle = '#999';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText('€' + value.toFixed(0), paddingLeft - 10, y + 4);
+            }
+            
+            // Helper function to calculate Y position
+            const getY = (value) => {
+                return height - paddingBottom - ((value - minAmount) / range) * chartHeight;
+            };
+            
+            // Find min and max for color mapping
+            const minVal = Math.min(...amounts);
+            const maxVal = Math.max(...amounts);
+            
+            // Helper function to get color based on value
+            const getColor = (value, alpha = 1) => {
+                if (showingMyMoney) {
+                    // Green for positive, red for negative
+                    return value >= 0 ? `rgba(39, 174, 96, ${alpha})` : `rgba(231, 76, 60, ${alpha})`;
+                } else {
+                    // Blue (low) to Red (high) for DD
+                    const normalized = (value - minVal) / (maxVal - minVal);
+                    const r = Math.round(52 + normalized * (231 - 52));
+                    const g = Math.round(152 - normalized * (152 - 76));
+                    const b = Math.round(219 - normalized * (219 - 60));
+                    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+                }
+            };
+            
+            // Draw filled area under curve with gradient
+            const gradient = ctx.createLinearGradient(0, height - paddingBottom, 0, paddingTop);
+            if (showingMyMoney) {
+                // Purple (low/negative) to Teal (high/positive) gradient
+                gradient.addColorStop(0, 'rgba(155, 89, 182, 0.2)');   // Purple at bottom (low values)
+                gradient.addColorStop(0.5, 'rgba(52, 152, 219, 0.2)'); // Blue in middle
+                gradient.addColorStop(1, 'rgba(26, 188, 156, 0.4)');   // Teal at top (high values)
+            } else {
+                gradient.addColorStop(0, getColor(minVal, 0.2));
+                gradient.addColorStop(1, getColor(maxVal, 0.4));
+            }
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            
+            const ddPoints = [];
+            for (let i = 0; i < amounts.length; i++) {
+                const x = paddingLeft + (chartWidth / (amounts.length - 1)) * i;
+                const y = getY(amounts[i]);
+                ddPoints.push({ x, y, value: amounts[i] });
+            }
+            
+            // Start from bottom left
+            ctx.moveTo(ddPoints[0].x, height - paddingBottom);
+            ctx.lineTo(ddPoints[0].x, ddPoints[0].y);
+            
+            // Draw smooth curve through all points
+            if (ddPoints.length === 2) {
+                ctx.lineTo(ddPoints[1].x, ddPoints[1].y);
+            } else {
+                for (let i = 0; i < ddPoints.length - 1; i++) {
+                    const p0 = ddPoints[Math.max(0, i - 1)];
+                    const p1 = ddPoints[i];
+                    const p2 = ddPoints[i + 1];
+                    const p3 = ddPoints[Math.min(ddPoints.length - 1, i + 2)];
+                    
+                    const tension = 0.5;
+                    const cp1x = p1.x + (p2.x - p0.x) / 6 * tension;
+                    const cp1y = p1.y + (p2.y - p0.y) / 6 * tension;
+                    const cp2x = p2.x - (p3.x - p1.x) / 6 * tension;
+                    const cp2y = p2.y - (p3.y - p1.y) / 6 * tension;
+                    
+                    ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+                }
+            }
+            
+            // Close path to bottom
+            const lastPoint = ddPoints[ddPoints.length - 1];
+            ctx.lineTo(lastPoint.x, height - paddingBottom);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Draw smooth line on top with gradient
+            const lineGradient = ctx.createLinearGradient(0, height - paddingBottom, 0, paddingTop);
+            if (showingMyMoney) {
+                // Purple (low/negative) to Teal (high/positive) gradient
+                lineGradient.addColorStop(0, 'rgba(155, 89, 182, 1)');   // Purple at bottom
+                lineGradient.addColorStop(0.5, 'rgba(52, 152, 219, 1)'); // Blue in middle
+                lineGradient.addColorStop(1, 'rgba(26, 188, 156, 1)');   // Teal at top
+            } else {
+                lineGradient.addColorStop(0, getColor(minVal, 1));
+                lineGradient.addColorStop(1, getColor(maxVal, 1));
+            }
+            
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = lineGradient;
+            ctx.beginPath();
+            
+            ctx.moveTo(ddPoints[0].x, ddPoints[0].y);
+            
+            if (ddPoints.length === 2) {
+                ctx.lineTo(ddPoints[1].x, ddPoints[1].y);
+            } else {
+                for (let i = 0; i < ddPoints.length - 1; i++) {
+                    const p0 = ddPoints[Math.max(0, i - 1)];
+                    const p1 = ddPoints[i];
+                    const p2 = ddPoints[i + 1];
+                    const p3 = ddPoints[Math.min(ddPoints.length - 1, i + 2)];
+                    
+                    const tension = 0.5;
+                    const cp1x = p1.x + (p2.x - p0.x) / 6 * tension;
+                    const cp1y = p1.y + (p2.y - p0.y) / 6 * tension;
+                    const cp2x = p2.x - (p3.x - p1.x) / 6 * tension;
+                    const cp2y = p2.y - (p3.y - p1.y) / 6 * tension;
+                    
+                    ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+                }
+            }
+            
+            ctx.stroke();
+            
+            // Draw DD points (interactive) - colored by value
+            ddPoints.forEach((point, i) => {
+                ctx.fillStyle = getColor(point.value, 1);
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 5, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            
+            // Draw month labels
+            ddPoints.forEach((point, i) => {
+                ctx.fillStyle = '#666';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(labels[i], point.x, height - paddingBottom + 20);
+            });
+            
+        }
+
+                function getNextMonthKey(monthKey) {
+            const [year, month] = monthKey.split('-');
+            const nextDate = new Date(year, month, 1);
+            return `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}`;
+        }
+
+        function renderIncomeSpending() {
+            const canvas = document.getElementById('incomeSpendingChart');
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+            
+            // Get canvas container dimensions
+            const container = canvas.parentElement;
+            const size = container.offsetWidth;
+            
+            canvas.width = size * dpr;
+            canvas.height = size * dpr;
+            ctx.scale(dpr, dpr);
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, size, size);
+            
+            // Define the 6 months to display: Jan, Feb, Mar, Apr, May, Jun
+            const today = new Date();
+            const currentYear = today.getFullYear();
+            const monthsToShow = [
+                { year: currentYear, month: 0, name: 'Jan' },  // January
+                { year: currentYear, month: 1, name: 'Feb' },  // February
+                { year: currentYear, month: 2, name: 'Mar' },  // March
+                { year: currentYear, month: 3, name: 'Apr' },  // April
+                { year: currentYear, month: 4, name: 'May' },  // May
+                { year: currentYear, month: 5, name: 'Jun' }   // June
+            ];
+            
+            // Calculate data for each month - COUNT BOTH COMPLETED AND UNCOMPLETED
+            const monthlyData = monthsToShow.map(monthInfo => {
+                let income = 0;
+                let spending = 0;
+                
+                transactions.forEach(t => {
+                    // Count all transactions, not just completed ones
+                    const tDate = new Date(t.date);
+                    if (tDate.getMonth() === monthInfo.month && tDate.getFullYear() === monthInfo.year) {
+                        if (t.amount > 0) {
+                            income += t.amount;
+                        } else {
+                            spending += Math.abs(t.amount);
+                        }
+                    }
+                });
+                
+                return {
+                    month: monthInfo.name,
+                    income: income,
+                    spending: spending
+                };
+            });
+            
+            // Chart dimensions
+            const paddingLeft = 60;
+            const paddingRight = 20;
+            const paddingTop = 20;
+            const paddingBottom = 50;
+            
+            const chartWidth = size - paddingLeft - paddingRight;
+            const chartHeight = size - paddingTop - paddingBottom;
+            
+            // Find max value for scaling
+            const maxValue = Math.max(...monthlyData.map(d => Math.max(d.income, d.spending)), 100); // Minimum 100
+            let yMax = Math.ceil(maxValue / 100) * 100;
+            
+            // Determine Y-axis step
+            let yStep;
+            if (yMax <= 1000) {
+                yStep = 200;
+            } else if (yMax <= 2500) {
+                yStep = 500;
+            } else {
+                yStep = 1000;
+            }
+            yMax = Math.ceil(maxValue / yStep) * yStep;
+            
+            // Draw Y-axis grid lines and labels
+            const ySteps = yMax / yStep;
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+            ctx.fillStyle = '#999';
+            ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+            ctx.textAlign = 'right';
+            
+            for (let i = 0; i <= ySteps; i++) {
+                const y = paddingTop + chartHeight - (i / ySteps) * chartHeight;
+                const value = i * yStep;
+                
+                ctx.beginPath();
+                ctx.moveTo(paddingLeft, y);
+                ctx.lineTo(paddingLeft + chartWidth, y);
+                ctx.stroke();
+                
+                ctx.fillText('€' + value, paddingLeft - 10, y + 4);
+            }
+            
+            // Helper function for smooth curves (cardinal spline)
+            function drawSmoothCurve(points, tension = 0.5) {
+                if (points.length < 2) return;
+                
+                ctx.beginPath();
+                ctx.moveTo(points[0].x, points[0].y);
+                
+                for (let i = 0; i < points.length - 1; i++) {
+                    const p0 = points[Math.max(0, i - 1)];
+                    const p1 = points[i];
+                    const p2 = points[i + 1];
+                    const p3 = points[Math.min(points.length - 1, i + 2)];
+                    
+                    const cp1x = p1.x + (p2.x - p0.x) / 6 * tension;
+                    const cp1y = p1.y + (p2.y - p0.y) / 6 * tension;
+                    const cp2x = p2.x - (p3.x - p1.x) / 6 * tension;
+                    const cp2y = p2.y - (p3.y - p1.y) / 6 * tension;
+                    
+                    ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+                }
+            }
+            
+            // Prepare data points
+            const incomePoints = [];
+            const spendingPoints = [];
+            const xStep = chartWidth / (monthlyData.length - 1);
+            
+            monthlyData.forEach((data, index) => {
+                const x = paddingLeft + index * xStep;
+                const incomeY = paddingTop + chartHeight - (data.income / yMax) * chartHeight;
+                const spendingY = paddingTop + chartHeight - (data.spending / yMax) * chartHeight;
+                
+                incomePoints.push({ x, y: incomeY });
+                spendingPoints.push({ x, y: spendingY });
+            });
+            
+            // Draw income curve with gradient fill
+            const incomeGradient = ctx.createLinearGradient(0, paddingTop, 0, paddingTop + chartHeight);
+            incomeGradient.addColorStop(0, 'rgba(39, 174, 96, 0.3)');
+            incomeGradient.addColorStop(1, 'rgba(39, 174, 96, 0.05)');
+            
+            ctx.save();
+            drawSmoothCurve(incomePoints);
+            ctx.lineTo(incomePoints[incomePoints.length - 1].x, paddingTop + chartHeight);
+            ctx.lineTo(incomePoints[0].x, paddingTop + chartHeight);
+            ctx.closePath();
+            ctx.fillStyle = incomeGradient;
+            ctx.fill();
+            ctx.restore();
+            
+            // Draw income line
+            ctx.strokeStyle = '#27ae60';
+            ctx.lineWidth = 2.5;
+            drawSmoothCurve(incomePoints);
+            ctx.stroke();
+            
+            // Draw spending curve with gradient fill
+            const spendingGradient = ctx.createLinearGradient(0, paddingTop, 0, paddingTop + chartHeight);
+            spendingGradient.addColorStop(0, 'rgba(231, 76, 60, 0.3)');
+            spendingGradient.addColorStop(1, 'rgba(231, 76, 60, 0.05)');
+            
+            ctx.save();
+            ctx.beginPath();
+            drawSmoothCurve(spendingPoints);
+            ctx.lineTo(spendingPoints[spendingPoints.length - 1].x, paddingTop + chartHeight);
+            ctx.lineTo(spendingPoints[0].x, paddingTop + chartHeight);
+            ctx.closePath();
+            ctx.fillStyle = spendingGradient;
+            ctx.fill();
+            ctx.restore();
+            
+            // Draw spending line
+            ctx.strokeStyle = '#e74c3c';
+            ctx.lineWidth = 2.5;
+            drawSmoothCurve(spendingPoints);
+            ctx.stroke();
+            
+            // Draw month labels
+            ctx.fillStyle = '#666';
+            ctx.textAlign = 'center';
+            ctx.font = '13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+            
+            monthlyData.forEach((data, index) => {
+                const x = paddingLeft + index * xStep;
+                ctx.fillText(data.month, x, size - paddingBottom + 25);
+            });
+            
+            // Draw prettier legend with rounded background
+            const legendY = paddingTop + 5;
+            const legendX = paddingLeft + chartWidth - 165;
+            const legendPadding = 8;
+            const legendItemGap = 12;
+            
+            // Background for legend
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+            ctx.shadowBlur = 8;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 2;
+            
+            // Draw rounded rectangle background
+            const legendWidth = 155;
+            const legendHeight = 28;
+            const borderRadius = 6;
+            
+            ctx.beginPath();
+            ctx.moveTo(legendX + borderRadius, legendY);
+            ctx.lineTo(legendX + legendWidth - borderRadius, legendY);
+            ctx.quadraticCurveTo(legendX + legendWidth, legendY, legendX + legendWidth, legendY + borderRadius);
+            ctx.lineTo(legendX + legendWidth, legendY + legendHeight - borderRadius);
+            ctx.quadraticCurveTo(legendX + legendWidth, legendY + legendHeight, legendX + legendWidth - borderRadius, legendY + legendHeight);
+            ctx.lineTo(legendX + borderRadius, legendY + legendHeight);
+            ctx.quadraticCurveTo(legendX, legendY + legendHeight, legendX, legendY + legendHeight - borderRadius);
+            ctx.lineTo(legendX, legendY + borderRadius);
+            ctx.quadraticCurveTo(legendX, legendY, legendX + borderRadius, legendY);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            
+            // Income legend item with circle
+            const itemY = legendY + legendHeight / 2;
+            ctx.fillStyle = '#27ae60';
+            ctx.beginPath();
+            ctx.arc(legendX + legendPadding + 6, itemY, 5, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#333';
+            ctx.textAlign = 'left';
+            ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+            ctx.fillText('Income', legendX + legendPadding + 18, itemY + 4);
+            
+            // Spending legend item with circle
+            ctx.fillStyle = '#e74c3c';
+            ctx.beginPath();
+            ctx.arc(legendX + legendPadding + 72, itemY, 5, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#333';
+            ctx.fillText('Spending', legendX + legendPadding + 84, itemY + 4);
+        }
+
+        function categorizeTransaction(event, amount, comment, savedCategory) {
+            // If there's a manually saved category in the sheet, use it
+            if (savedCategory && savedCategory !== 'auto' && savedCategory !== '') {
+                return savedCategory;
+            }
+            
+            const eventLower = event.toLowerCase();
+            
+            // Income
+            if (amount > 0) {
+                return 'Income';
+            }
+            
+            // NOTE: We no longer assign "Débit différé" as a category
+            // DD transactions are identified by comment "DD" for calculations only
+            // They should be categorized by their actual expense type (Living, Services, etc.)
+            
+            // Well-being: spa, massage, hair, beauty, gym, sports
+            if (eventLower.includes('spa') || 
+                eventLower.includes('massage') ||
+                eventLower.includes('hair') ||
+                eventLower.includes('salon') ||
+                eventLower.includes('beauty') ||
+                eventLower.includes('gym') ||
+                eventLower.includes('sport') ||
+                eventLower.includes('yoga') ||
+                eventLower.includes('therapy')) {
+                return 'Well-being';
+            }
+            
+            // Pets - guinea pigs and pet-related
+            if (eventLower.includes('guinea') || 
+                eventLower.includes('pet') ||
+                eventLower.includes('cochon') ||
+                eventLower.includes('vet') ||
+                eventLower.includes('advetia') ||
+                eventLower.includes('animalis')) {
+                return 'Pets';
+            }
+            
+            // Living: Rent, utilities, internet, phone, transport
+            if (eventLower.includes('rent') || 
+                eventLower.includes('fibre') || 
+                eventLower.includes('sosh') || 
+                eventLower.includes('electricity') ||
+                eventLower.includes('electricité') ||
+                eventLower.includes('edf') ||
+                eventLower.includes('bouygues') ||
+                eventLower.includes('transport') ||
+                eventLower.includes('navigo')) {
+                return 'Living';
+            }
+            
+            // Food: Groceries, canteen, restaurants
+            if (eventLower.includes('groceries') || 
+                eventLower.includes('grocer') ||
+                eventLower.includes('lidl') ||
+                eventLower.includes('intermarche') ||
+                eventLower.includes('auchan') ||
+                eventLower.includes('supermarket') ||
+                eventLower.includes('canteen') ||
+                eventLower.includes('cantine') ||
+                eventLower.includes('eurest')) {
+                return 'Food';
+            }
+            
+            // Social: Bars, restaurants, entertainment, cinema, tobacco
+            if (eventLower.includes('bar') || 
+                eventLower.includes('restaurant') ||
+                eventLower.includes('resto') ||
+                eventLower.includes('burger') ||
+                eventLower.includes('mcdonald') ||
+                eventLower.includes('tacos') ||
+                eventLower.includes('cinema') ||
+                eventLower.includes('ugc') ||
+                eventLower.includes('club') ||
+                eventLower.includes('tabac') ||
+                eventLower.includes('drink') ||
+                eventLower.includes('bolt')) {
+                return 'Social';
+            }
+            
+            // Services: Subscriptions, insurance, bank fees
+            if (eventLower.includes('subscription') || 
+                eventLower.includes('insurance') || 
+                eventLower.includes('assurance') ||
+                eventLower.includes('cotisations') ||
+                eventLower.includes('bpce') ||
+                eventLower.includes('apple') ||
+                eventLower.includes('icloud') ||
+                eventLower.includes('rozmova') ||
+                eventLower.includes('amazon') ||
+                eventLower.includes('malakoff') ||
+                eventLower.includes('orange')) {
+                return 'Services';
+            }
+            
+            // Other: Everything else
+            return 'Other';
+        }
+
+        function toggleStatistics() {
+            showingStatistics = !showingStatistics;
+            const listContainer = document.getElementById('transactionListContainer');
+            const statsContainer = document.getElementById('statisticsContainer');
+            const ddContainer = document.getElementById('ddTrackingContainer');
+            const cashflowBtn = document.getElementById('cashflowBtn');
+            const debtBtn = document.getElementById('debtBtn');
+            const realMoneyBtn = document.getElementById('realMoneyBtn');
+            const statsBtn = document.getElementById('statsBtn');
+            
+            if (showingStatistics) {
+                listContainer.classList.add('hidden');
+                statsContainer.classList.remove('hidden');
+                ddContainer.classList.add('hidden');
+                
+                cashflowBtn.textContent = '📈';
+                debtBtn.textContent = '💀';
+                realMoneyBtn.textContent = '💰';
+                statsBtn.textContent = '🏠';
+                
+                showingDDTracking = false;
+                renderStatistics();
+            } else {
+                listContainer.classList.remove('hidden');
+                statsContainer.classList.add('hidden');
+                
+                cashflowBtn.textContent = '📈';
+                debtBtn.textContent = '💀';
+                realMoneyBtn.textContent = '💰';
+                statsBtn.textContent = '📊';
+            }
+        }
+
+
+        function renderStatistics() {
+            let completedTransactions;
+            
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+            
+            if (statsPeriod === 'thisMonth') {
+                completedTransactions = transactions.filter(t => {
+                    if (t.status !== '✅') return false;
+                    const tDate = new Date(t.date);
+                    return tDate.getMonth() === currentMonth && tDate.getFullYear() === currentYear;
+                });
+            } else if (statsPeriod === 'nextMonth') {
+                const nextMonth = currentMonth === 11 ? 0 : currentMonth + 1;
+                const nextYear = currentMonth === 11 ? currentYear + 1 : currentYear;
+                
+                completedTransactions = transactions.filter(t => {
+                    const tDate = new Date(t.date);
+                    return tDate.getMonth() === nextMonth && tDate.getFullYear() === nextYear;
+                });
+            } else {
+                completedTransactions = transactions.filter(t => t.status === '✅');
+            }
+            
+            const categoryTotals = {};
+            completedTransactions.forEach(t => {
+                const category = categorizeTransaction(t.event, t.amount, t.comment, t.category);
+                if (!categoryTotals[category]) {
+                    categoryTotals[category] = 0;
+                }
+                if (t.amount < 0) {
+                    categoryTotals[category] += Math.abs(t.amount);
+                }
+            });
+            
+            delete categoryTotals['Income'];
+            
+            const sortedCategories = Object.entries(categoryTotals)
+                .sort((a, b) => b[1] - a[1]);
+            
+            const categories = sortedCategories.map(([cat]) => cat);
+            const amounts = sortedCategories.map(([, amt]) => amt);
+            
+            const colors = {
+                'Living': '#667eea',
+                'Food': '#27ae60',
+                'Services': '#e74c3c',
+                'Social': '#9b59b6',
+                'Well-being': '#3498db',
+                'Pets': '#e91e63',
+                'Other': '#f39c12'
+            };
+            
+            const canvas = document.getElementById('expenseChart');
+            const ctx = canvas.getContext('2d');
+            
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+            
+            drawPieChart(ctx, categories, amounts, colors);
+            
+            const breakdown = document.getElementById('categoryBreakdown');
+            const total = amounts.reduce((sum, val) => sum + val, 0);
+            
+            const categoryEmojis = {
+                'Living': '🏠',
+                'Food': '🥕',
+                'Services': '💳',
+                'Social': '🍻',
+                'Well-being': '💆',
+                'Pets': '🐹',
+                'Other': '🧾'
+            };
+            
+            breakdown.innerHTML = `
+                ${categories.map((cat, i) => {
+                    const percentage = ((amounts[i] / total) * 100).toFixed(1);
+                    return `
+                        <div onclick="showCategoryTransactions('${cat}')" style="padding: 12px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background='white'">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 20px;">${categoryEmojis[cat] || '❓'}</span>
+                                    <span style="font-weight: 600; color: #333; font-size: 15px;">${cat}</span>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-weight: 700; font-size: 18px; color: #333;">${percentage}%</div>
+                                    <div style="font-size: 13px; color: #999; margin-top: 2px;">€${amounts[i].toFixed(2)}</div>
+                                </div>
+                            </div>
+                            <div style="width: 100%; height: 6px; background: #f0f0f0; border-radius: 3px; overflow: hidden;">
+                                <div style="width: ${percentage}%; height: 100%; background: ${colors[cat]}; border-radius: 3px; transition: width 0.3s ease;"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+                <div style="margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 600; font-size: 16px; color: #333;">Total expenses</span>
+                        <span style="font-weight: 700; font-size: 20px; color: #e74c3c;">€${total.toFixed(2)}</span>
+                    </div>
+                </div>
+                <div id="categoryTransactions" style="margin-top: 20px;"></div>
+            `;
+        }
+
+        function drawPieChart(ctx, labels, data, colors) {
+            const canvas = ctx.canvas;
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(centerX, centerY) - 80;
+            
+            const emojis = {
+                'Living': '🏠',
+                'Food': '🥕',
+                'Services': '💳',
+                'Social': '🍻',
+                'Well-being': '💆',
+                'Pets': '🐹',
+                'Other': '🧾'
+            };
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const total = data.reduce((sum, val) => sum + val, 0);
+            let currentAngle = -Math.PI / 2;
+            
+            data.forEach((value, index) => {
+                const sliceAngle = (value / total) * 2 * Math.PI;
+                
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+                ctx.lineTo(centerX, centerY);
+                ctx.fillStyle = colors[labels[index]];
+                ctx.fill();
+                
+                const labelAngle = currentAngle + sliceAngle / 2;
+                const labelX = centerX + (radius * 0.65) * Math.cos(labelAngle);
+                const labelY = centerY + (radius * 0.65) * Math.sin(labelAngle);
+                
+                const emojiSize = Math.floor(canvas.width / 12);
+                ctx.font = `${emojiSize}px sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(emojis[labels[index]] || '❓', labelX, labelY);
+                
+                currentAngle += sliceAngle;
+            });
+        }
+
+        function showCategoryTransactions(category) {
+            const container = document.getElementById('categoryTransactions');
+            const now = new Date();
+            
+            const categoryTransactions = transactions
+                .filter(t => {
+                    if (categorizeTransaction(t.event, t.amount, t.comment, t.category) !== category) return false;
+                    
+                    const tDate = new Date(t.date);
+                    if (statsPeriod === 'thisMonth') {
+                        if (tDate.getMonth() !== now.getMonth() || tDate.getFullYear() !== now.getFullYear()) {
+                            return false;
+                        }
+                        if (t.status !== '✅') return false;
+                    } else if (statsPeriod === 'nextMonth') {
+                        const nextMonth = now.getMonth() === 11 ? 0 : now.getMonth() + 1;
+                        const nextYear = now.getMonth() === 11 ? now.getFullYear() + 1 : now.getFullYear();
+                        if (tDate.getMonth() !== nextMonth || tDate.getFullYear() !== nextYear) {
+                            return false;
+                        }
+                    } else {
+                        if (t.status !== '✅') return false;
+                    }
+                    
+                    return true;
+                })
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            if (categoryTransactions.length === 0) {
+                container.innerHTML = `
+                    <div style="padding: 20px; text-align: center; color: #999;">
+                        No transactions in this category
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = `
+                <div style="border-top: 2px solid #667eea; padding-top: 15px;">
+                    <h4 style="margin-bottom: 15px; color: #333;">${category} transactions</h4>
+                    ${categoryTransactions.map(t => `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #f0f0f0;">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: #333; margin-bottom: 3px;">
+                                    ${t.event}
+                                </div>
+                                <div style="font-size: 12px; color: #999;">
+                                    ${formatDate(t.date)}
+                                </div>
+                                ${t.comment ? `<div style="font-size: 13px; color: #666; margin-top: 3px;">${t.comment}</div>` : ''}
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-weight: bold; font-size: 16px; color: ${t.amount >= 0 ? '#27ae60' : '#e74c3c'};">
+                                    ${t.amount >= 0 ? '+' : ''}€${Math.abs(t.amount).toFixed(2)}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                    <div style="text-align: center; margin-top: 15px;">
+                        <button onclick="document.getElementById('categoryTransactions').innerHTML=''" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+
+        function init() {
+            const savedScriptUrl = localStorage.getItem('scriptUrl');
+            if (savedScriptUrl) {
+                scriptUrl = savedScriptUrl;
+                document.getElementById('setupCard').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                loadFromSheet();
+            }
+            
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dateInput').value = today;
+            
+            document.getElementById('dateInput').addEventListener('change', function(e) {
+                const selectedDate = new Date(e.target.value);
+                const todayDate = new Date();
+                todayDate.setHours(0, 0, 0, 0);
+                selectedDate.setHours(0, 0, 0, 0);
+                
+                if (selectedDate > todayDate) {
+                    document.getElementById('statusInput').value = '⏳';
+                } else {
+                    document.getElementById('statusInput').value = '✅';
+                }
+            });
+        }
+
+        function connectSheet() {
+            const inputScriptUrl = document.getElementById('scriptUrlInput').value.trim();
+            
+            if (!inputScriptUrl) {
+                alert('Please enter your Apps Script URL');
+                return;
+            }
+
+            scriptUrl = inputScriptUrl;
+            localStorage.setItem('scriptUrl', scriptUrl);
+            
+            document.getElementById('setupCard').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            
+            loadFromSheet();
+        }
+
+        function disconnectSheet() {
+            if (confirm('Disconnect from Google Sheet? Your data will remain in the sheet.')) {
+                scriptUrl = null;
+                localStorage.removeItem('scriptUrl');
+                location.reload();
+            }
+        }
+
+        async function loadFromSheet() {
+            if (!scriptUrl) return;
+            
+            updateSyncStatus('syncing', 'Loading from Google Sheets...');
+            
+            try {
+                const url = `${scriptUrl}?action=read`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load sheet. Check your Apps Script URL.');
+                }
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Unknown error');
+                }
+                
+                const rows = result.data || [];
+                const dataRows = rows.slice(1);
+                
+                transactions = dataRows.map((row, index) => {
+                    let date;
+                    let dateWarning = '';
+                    try {
+                        if (row[0]) {
+                            const dateStr = typeof row[0] === 'string' ? row[0] : row[0].toString();
+                            date = new Date(dateStr);
+                            if (isNaN(date.getTime())) {
+                                dateWarning = ` ⚠️ Invalid date: ${row[0]}`;
+                                date = new Date();
+                            }
+                        } else {
+                            date = new Date();
+                        }
+                    } catch (e) {
+                        dateWarning = ` ⚠️ Date error`;
+                        date = new Date();
+                    }
+                    
+                    const completed = row[4];
+                    let status = '✅';
+                    if (completed === false || completed === 'false' || completed === 'False' || completed === 'FALSE' || completed === 'F') {
+                        status = '⏳';
+                    }
+                    
+                    return {
+                        id: index,
+                        date: date.toISOString().split('T')[0],
+                        event: row[1] || '',
+                        amount: parseFloat(row[2]) || 0,
+                        category: row[3] || '', // Category from column D (index 3)
+                        status: status,
+                        comment: ((row[5] !== undefined && row[5] !== null) ? row[5] : '') + dateWarning
+                    };
+                });
+                
+                renderTransactions();
+                updateBalance();
+                updateSyncStatus('synced', '✓ Synced with Google Sheets');
+                
+            } catch (error) {
+                console.error('Error loading sheet:', error);
+                updateSyncStatus('error', '⚠ Error loading sheet: ' + error.message);
+            }
+        }
+
+        async function saveToSheet() {
+            if (!scriptUrl) return;
+            
+            updateSyncStatus('syncing', 'Saving to Google Sheets...');
+            
+            try {
+                const sorted = [...transactions].sort((a, b) => new Date(a.date) - new Date(b.date));
+                
+                const rows = sorted.map(t => {
+                    const completed = (t.status === '✅' || t.status === '▶️') ? 'TRUE' : 'FALSE';
+                    const categoryToSave = t.category && t.category !== 'auto' ? t.category : '';
+                    return [
+                        t.date,
+                        t.event,
+                        t.amount,
+                        categoryToSave, // Category in column D
+                        completed,
+                        t.comment
+                    ];
+                });
+                
+                rows.unshift(['Date', 'Event', 'Amount', 'Category', 'Completed', 'Comment']);
+                
+                const response = await fetch(scriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'write',
+                        values: rows
+                    })
+                });
+                
+                setTimeout(() => {
+                    loadFromSheet();
+                }, 1000);
+                
+                updateSyncStatus('synced', '✓ Saved to Google Sheets');
+                
+            } catch (error) {
+                console.error('Error saving to sheet:', error);
+                updateSyncStatus('error', '⚠ Error saving: ' + error.message);
+            }
+        }
+
+        function updateSyncStatus(status, message) {
+            const statusEl = document.getElementById('syncStatus');
+            statusEl.className = `sync-status ${status}`;
+            statusEl.innerHTML = message + ' <a href="#" onclick="disconnectSheet(); return false;" style="margin-left: 10px; color: inherit; text-decoration: underline;">Disconnect?</a>';
+        }
+
+        function refreshFromSheet() {
+            loadFromSheet();
+        }
+
+        function toggleExtraFields() {
+            const container = document.getElementById('extraFieldsContainer');
+            const toggle = document.getElementById('extraFieldsToggle');
+            
+            if (container.style.display === 'none') {
+                container.style.display = 'block';
+                toggle.textContent = 'Hide comment and multiple dates';
+            } else {
+                container.style.display = 'none';
+                toggle.textContent = 'Add comment or multiple dates';
+            }
+        }
+
+        function toggleForm() {
+            const form = document.getElementById('transactionForm');
+            form.classList.toggle('hidden');
+            
+            if (form.classList.contains('hidden')) {
+                editingTransactionId = null;
+                document.querySelector('.form-title').textContent = 'New transaction';
+                document.getElementById('saveBtn').textContent = 'Save to Google Sheet';
+                document.getElementById('deleteBtn').classList.add('hidden');
+                document.getElementById('categoryInput').value = 'auto';
+            }
+        }
+
+        function editTransaction(transactionId) {
+            const transaction = transactions.find(t => t.id === transactionId);
+            if (!transaction) return;
+            
+            document.getElementById('dateInput').value = transaction.date;
+            document.getElementById('eventInput').value = transaction.event;
+            document.getElementById('amountInput').value = Math.abs(transaction.amount);
+            document.getElementById('statusInput').value = transaction.status;
+            document.getElementById('commentInput').value = transaction.comment || '';
+            
+            document.getElementById('categoryInput').value = transaction.category || 'auto';
+            
+            // Set transaction type based on amount
+            if (transaction.amount < 0) {
+                setTransactionType('expense');
+            } else {
+                setTransactionType('income');
+            }
+            
+            editingTransactionId = transactionId;
+            document.querySelector('.form-title').textContent = 'Edit transaction';
+            document.getElementById('saveBtn').textContent = 'Update transaction';
+            document.getElementById('deleteBtn').classList.remove('hidden');
+            
+            document.getElementById('transactionForm').classList.remove('hidden');
+        }
+
+        async function deleteTransaction() {
+            if (!confirm('Delete this transaction?')) {
+                return;
+            }
+            
+            if (editingTransactionId !== null) {
+                transactions = transactions.filter(t => t.id !== editingTransactionId);
+                editingTransactionId = null;
+                
+                renderTransactions();
+                updateBalance();
+                
+                await saveToSheet();
+                
+                toggleForm();
+            }
+        }
+
+        function openMultiDateSelector() {
+            const modal = document.getElementById('multiDateModal');
+            modal.style.display = 'flex';
+            
+            // Set default date to current date input value
+            const currentDate = document.getElementById('dateInput').value;
+            if (currentDate) {
+                document.getElementById('multiDatePicker').value = currentDate;
+            }
+            
+            updateSelectedDatesList();
+        }
+
+        function closeMultiDateSelector() {
+            document.getElementById('multiDateModal').style.display = 'none';
+        }
+
+        function addDateToSelection() {
+            const datePicker = document.getElementById('multiDatePicker');
+            const date = datePicker.value;
+            
+            if (date && !selectedMultipleDates.includes(date)) {
+                selectedMultipleDates.push(date);
+                selectedMultipleDates.sort();
+                updateSelectedDatesList();
+            }
+        }
+
+        function removeDateFromSelection(date) {
+            selectedMultipleDates = selectedMultipleDates.filter(d => d !== date);
+            updateSelectedDatesList();
+        }
+
+        function updateSelectedDatesList() {
+            const list = document.getElementById('selectedDatesList');
+            
+            if (selectedMultipleDates.length === 0) {
+                list.innerHTML = '<div style="color: #999; text-align: center; padding: 20px;">No dates selected</div>';
+                return;
+            }
+            
+            list.innerHTML = selectedMultipleDates.map(date => {
+                const dateObj = new Date(date + 'T00:00:00');
+                const formatted = dateObj.toLocaleDateString('en-US', { 
+                    weekday: 'short', 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+                
+                return `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #f5f5f5; border-radius: 8px; margin-bottom: 8px;">
+                        <span style="font-size: 14px;">${formatted}</span>
+                        <button type="button" onclick="removeDateFromSelection('${date}')" style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 18px; padding: 0 4px;">&times;</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function applyMultipleDates() {
+            if (selectedMultipleDates.length === 0) {
+                alert('Please select at least one date');
+                return;
+            }
+            
+            // Update the display
+            const display = document.getElementById('selectedDatesDisplay');
+            display.textContent = `${selectedMultipleDates.length} dates selected`;
+            display.style.color = '#27ae60';
+            display.style.fontWeight = '600';
+            
+            // Disable the single date input
+            document.getElementById('dateInput').disabled = true;
+            document.getElementById('dateInput').style.opacity = '0.5';
+            
+            closeMultiDateSelector();
+        }
+
+        function clearMultipleDates() {
+            selectedMultipleDates = [];
+            document.getElementById('selectedDatesDisplay').textContent = '';
+            document.getElementById('dateInput').disabled = false;
+            document.getElementById('dateInput').style.opacity = '1';
+        }
+
+        async function addTransaction(event) {
+            event.preventDefault();
+            
+            const date = document.getElementById('dateInput').value;
+            const eventName = document.getElementById('eventInput').value;
+            let amount = parseFloat(document.getElementById('amountInput').value);
+            
+            // Apply sign based on transaction type
+            if (transactionType === 'expense' && amount > 0) {
+                amount = -amount;
+            } else if (transactionType === 'income' && amount < 0) {
+                amount = Math.abs(amount);
+            }
+            
+            const status = document.getElementById('statusInput').value;
+            const comment = document.getElementById('commentInput').value;
+            const selectedCategory = document.getElementById('categoryInput').value;
+
+            if (editingTransactionId !== null) {
+                // Edit existing transaction (no multiple dates for editing)
+                const index = transactions.findIndex(t => t.id === editingTransactionId);
+                if (index !== -1) {
+                    transactions[index] = {
+                        ...transactions[index],
+                        date: date,
+                        event: eventName,
+                        amount: amount,
+                        status: status,
+                        comment: comment,
+                        category: selectedCategory !== 'auto' ? selectedCategory : ''
+                    };
+                }
+                editingTransactionId = null;
+            } else {
+                // Determine which dates to use
+                const datesToUse = selectedMultipleDates.length > 0 ? selectedMultipleDates : [date];
+                
+                // Create transaction for each selected date
+                datesToUse.forEach(transDate => {
+                    const transaction = {
+                        id: Date.now() + Math.random(), // Ensure unique IDs
+                        date: transDate,
+                        event: eventName,
+                        amount: amount,
+                        status: status,
+                        comment: comment,
+                        category: selectedCategory !== 'auto' ? selectedCategory : ''
+                    };
+                    transactions.push(transaction);
+                });
+            }
+
+            renderTransactions();
+            updateBalance();
+            
+            await saveToSheet();
+            
+            document.getElementById('addForm').reset();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dateInput').value = today;
+            setTransactionType('expense'); // Reset to expense
+            document.querySelector('.form-title').textContent = 'New transaction';
+            document.getElementById('saveBtn').textContent = 'Save';
+            document.getElementById('categoryInput').value = 'auto';
+            clearMultipleDates(); // Clear multiple dates selection
+            toggleForm();
+        }
+
+        function calculateBalance() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const todayTransactions = transactions.filter(t => {
+                const transactionDate = new Date(t.date);
+                transactionDate.setHours(0, 0, 0, 0);
+                return transactionDate <= today;
+            });
+            
+            const futureTransactions = transactions.filter(t => {
+                const transactionDate = new Date(t.date);
+                transactionDate.setHours(0, 0, 0, 0);
+                return transactionDate > today;
+            });
+            
+            const total = todayTransactions.reduce((sum, t) => sum + t.amount, 0);
+            const available = todayTransactions
+                .filter(t => t.status !== '⏳')
+                .reduce((sum, t) => sum + t.amount, 0);
+            const pendingToday = todayTransactions
+                .filter(t => t.status === '⏳')
+                .reduce((sum, t) => sum + t.amount, 0);
+            
+            const sortedFuture = [...futureTransactions].sort((a, b) => new Date(a.date) - new Date(b.date));
+            const nextSalaryIndex = sortedFuture.findIndex(t => t.amount > 0 && t.event.toLowerCase().includes('salary'));
+            
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+            const upcomingThisMonth = futureTransactions.filter(t => {
+                const tDate = new Date(t.date);
+                return tDate.getMonth() === currentMonth && tDate.getFullYear() === currentYear;
+            }).reduce((sum, t) => sum + t.amount, 0);
+            
+            const nextDebitDiffere = sortedFuture.find(t => 
+                t.comment && t.comment.toUpperCase().includes('DD')
+            );
+            
+            let transactionsUntilDebit = 0;
+            let balanceAfterNextDebit = null;
+            let balanceAfterJustDebit = null;
+            let nextDebitAmount = 0;
+            let availableNextMonth = null;
+            
+            if (nextDebitDiffere) {
+                const firstDebitDate = new Date(nextDebitDiffere.date);
+                const nextMonth = firstDebitDate.getMonth();
+                const nextYear = firstDebitDate.getFullYear();
+                
+                const nextMonthDebitDiffere = sortedFuture.filter(t => {
+                    const tDate = new Date(t.date);
+                    return (t.comment && t.comment.toUpperCase().includes('DD')) &&
+                           tDate.getMonth() === nextMonth &&
+                           tDate.getFullYear() === nextYear;
+                });
+                
+                nextDebitAmount = nextMonthDebitDiffere.reduce((sum, t) => sum + t.amount, 0);
+                balanceAfterJustDebit = available + nextDebitAmount;
+                
+                const thisMonthSalary = sortedFuture.filter(t => {
+                    const tDate = new Date(t.date);
+                    return t.amount > 0 && 
+                           t.event.toLowerCase().includes('salary') &&
+                           tDate.getMonth() === currentMonth &&
+                           tDate.getFullYear() === currentYear;
+                }).reduce((sum, t) => sum + t.amount, 0);
+                
+                const nextMonthTransactions = sortedFuture.filter(t => {
+                    const tDate = new Date(t.date);
+                    return tDate.getMonth() === nextMonth && tDate.getFullYear() === nextYear;
+                });
+                
+                let nextMonthDD = 0;
+                let nextMonthLiving = 0;
+                let nextMonthServices = 0;
+                
+                nextMonthTransactions.forEach(t => {
+                    const category = categorizeTransaction(t.event, t.amount, t.comment, t.category);
+                    // Débit différé is identified by comment "DD", not category
+                    if (t.comment && t.comment.toUpperCase().includes('DD')) {
+                        nextMonthDD += t.amount;
+                    } else if (category === 'Living') {
+                        nextMonthLiving += t.amount;
+                    } else if (category === 'Services') {
+                        nextMonthServices += t.amount;
+                    }
+                });
+                
+                availableNextMonth = available + thisMonthSalary + nextMonthDD + nextMonthLiving + nextMonthServices;
+                balanceAfterNextDebit = availableNextMonth;
+            }
+            
+            return { 
+                total, 
+                available, 
+                pendingToday,
+                upcomingThisMonth,
+                balanceAfterNextDebit,
+                balanceAfterJustDebit,
+                transactionsUntilDebit,
+                nextDebitAmount,
+                futureCount: futureTransactions.length
+            };
+        }
+
+        function updateBalance() {
+            const { total, available, pendingToday, upcomingThisMonth, balanceAfterNextDebit, balanceAfterJustDebit, transactionsUntilDebit, nextDebitAmount, futureCount } = calculateBalance();
+            
+            const myMoney = balanceAfterJustDebit !== null ? balanceAfterJustDebit : available;
+            const myMoneyEl = document.getElementById('myMoneyBalance');
+            myMoneyEl.textContent = `€${myMoney.toFixed(2)}`;
+            
+            if (myMoney < 0) {
+                myMoneyEl.classList.add('negative');
+                myMoneyEl.classList.remove('positive');
+                myMoneyEl.style.color = '#e74c3c';
+            } else {
+                myMoneyEl.classList.remove('negative');
+                myMoneyEl.style.color = '#27ae60';
+            }
+            
+            const availableEl = document.getElementById('availableAmount');
+            availableEl.textContent = `€${available.toFixed(2)}`;
+            availableEl.style.color = available < 0 ? '#e74c3c' : '#667eea';
+            
+            const afterDebitEl = document.getElementById('afterDebitBalance');
+            if (balanceAfterNextDebit !== null) {
+                afterDebitEl.textContent = `€${balanceAfterNextDebit.toFixed(2)}`;
+                if (balanceAfterNextDebit < 0) {
+                    afterDebitEl.style.color = '#e74c3c';
+                } else {
+                    afterDebitEl.style.color = '#27ae60';
+                }
+            } else {
+                afterDebitEl.textContent = 'N/A';
+                afterDebitEl.style.color = '#999';
+            }
+            
+            document.getElementById('futureCount').textContent = futureCount;
+        }
+
+        function renderTransactions() {
+            const container = document.getElementById('transactionsList');
+            
+            if (transactions.length === 0) {
+                container.innerHTML = '<div class="empty-state">No transactions yet. Add your first one!</div>';
+                return;
+            }
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            let displayTransactions;
+            if (showFuture) {
+                const endNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+                endNextMonth.setHours(23, 59, 59, 999);
+
+                displayTransactions = transactions.filter(t => {
+                    const transactionDate = new Date(t.date);
+                    return transactionDate <= endNextMonth;
+                });
+            } else {
+                displayTransactions = transactions.filter(t => {
+                    const transactionDate = new Date(t.date);
+                    transactionDate.setHours(0, 0, 0, 0);
+                    return transactionDate <= today;
+                });
+            }
+
+            const sorted = [...displayTransactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            const categoryEmojis = {
+                'Living': '🏠',
+                'Food': '🥕',
+                'Services': '💳',
+                'Social': '🍻',
+                'Well-being': '💆',
+                'Pets': '🐹',
+                'Income': '💰',
+                'Other': '🧾'
+            };
+            
+            const withBalances = sorted.reverse().map(t => {
+                const upToDate = transactions.filter(tx => {
+                    return new Date(tx.date) <= new Date(t.date);
+                }).reduce((sum, tx) => sum + tx.amount, 0);
+                const category = categorizeTransaction(t.event, t.amount, t.comment, t.category);
+                return { ...t, balance: upToDate, category: category };
+            }).reverse();
+
+            container.innerHTML = withBalances.map(t => {
+                const transactionDate = new Date(t.date);
+                transactionDate.setHours(0, 0, 0, 0);
+                const isFuture = transactionDate > today;
+                const categoryEmoji = categoryEmojis[t.category] || '❓';
+                const greyStyle = isFuture ? 'color: #999 !important;' : '';
+                const boldStyle = isFuture ? 'font-weight: bold;' : '';
+                
+                return `
+                <div class="transaction-item" style="display: flex; align-items: stretch;" onclick="editTransaction(${t.id})">
+                    <div style="font-size: 24px; line-height: 1; margin-right: 8px; display: flex; align-items: center; ${greyStyle}">${categoryEmoji}</div>
+                    <div class="transaction-info" style="flex: 1;">
+                        <div class="transaction-event" style="${greyStyle} ${boldStyle}">
+                            ${t.event.length > 13 ? t.event.substring(0, 13) + '...' : t.event}<sup style="display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: ${t.status === '✅' ? '#27ae60' : '#f39c12'}; margin-left: 2px;"></sup>
+                        </div>
+                        <div class="transaction-date" style="${greyStyle}">${formatDate(t.date)}${t.comment ? ` (${t.comment.length > 6 ? t.comment.substring(0, 6) + '...' : t.comment})` : ''}</div>
+                    </div>
+                    <div class="transaction-right">
+                        <div class="transaction-amount ${t.amount >= 0 ? 'positive' : 'negative'}" style="${boldStyle}">
+                            ${t.amount >= 0 ? '' : ''}€${Math.abs(t.amount).toFixed(2)}
+                        </div>
+                        <div class="transaction-balance" style="${greyStyle}">€${t.balance.toFixed(2)}</div>
+                    </div>
+                </div>
+            `}).join('');
+        }
+        
+        function toggleFutureTransactions() {
+            showFuture = !showFuture;
+            const btn = document.getElementById('futureToggleBtn');
+            const futureCount = calculateBalance().futureCount;
+            
+            if (showFuture) {
+                btn.innerHTML = `Hide future (<span id="futureCount">${futureCount}</span>)`;
+            } else {
+                btn.innerHTML = `Show future (<span id="futureCount">${futureCount}</span>)`;
+            }
+            
+            renderTransactions();
+        }
+
+        function showMyMoneyExplanation() {
+            const { available, balanceAfterJustDebit, nextDebitAmount } = calculateBalance();
+            const myMoney = balanceAfterJustDebit !== null ? balanceAfterJustDebit : available;
+            
+            let explanation = '📊 My money calculation:\n\n';
+            
+            if (balanceAfterJustDebit !== null) {
+                explanation += `Available in account: €${available.toFixed(2)}\n`;
+                explanation += `+ Next month's Débit différé: €${nextDebitAmount.toFixed(2)}\n`;
+                explanation += `= €${myMoney.toFixed(2)}\n\n`;
+                explanation += 'This shows your real financial position after the next Débit différé charges hit.';
+            } else {
+                explanation += `No upcoming Débit différé found.\n`;
+                explanation += `My Money = Available in account\n`;
+                explanation += `= €${available.toFixed(2)}`;
+            }
+            
+            alert(explanation);
+        }
+
+        function showAvailableExplanation() {
+            const today = new Date();
+            const todayStr = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+            
+            const completedToday = transactions.filter(t => {
+                const transactionDate = new Date(t.date);
+                transactionDate.setHours(0, 0, 0, 0);
+                const todayDate = new Date();
+                todayDate.setHours(0, 0, 0, 0);
+                return transactionDate <= todayDate && t.status === '✅';
+            });
+            
+            const total = completedToday.reduce((sum, t) => sum + t.amount, 0);
+            
+            let explanation = '💰 Available in account:\n\n';
+            explanation += `Sum of all completed (✅) transactions up to ${todayStr}\n\n`;
+            explanation += `Total: €${total.toFixed(2)}\n\n`;
+            explanation += 'This is what\'s actually in your bank account right now (excludes expected ⏳ transactions).';
+            
+            alert(explanation);
+        }
+
+        function showNextMonthExplanation() {
+            const { available } = calculateBalance();
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+            
+            const sortedFuture = transactions.filter(t => {
+                const transactionDate = new Date(t.date);
+                transactionDate.setHours(0, 0, 0, 0);
+                const todayDate = new Date();
+                todayDate.setHours(0, 0, 0, 0);
+                return transactionDate > todayDate;
+            }).sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            const thisMonthSalary = sortedFuture.filter(t => {
+                const tDate = new Date(t.date);
+                return t.amount > 0 && 
+                       t.event.toLowerCase().includes('salary') &&
+                       tDate.getMonth() === currentMonth &&
+                       tDate.getFullYear() === currentYear;
+            }).reduce((sum, t) => sum + t.amount, 0);
+            
+            const nextDebitDiffere = sortedFuture.find(t => 
+                t.comment && t.comment.toUpperCase().includes('DD')
+            );
+            
+            let explanation = '📅 Available next month:\n\n';
+            explanation += `Available today: €${available.toFixed(2)}\n`;
+            explanation += `+ This month's salary: €${thisMonthSalary.toFixed(2)}\n`;
+            
+            if (nextDebitDiffere) {
+                const firstDebitDate = new Date(nextDebitDiffere.date);
+                const nextMonth = firstDebitDate.getMonth();
+                const nextYear = firstDebitDate.getFullYear();
+                
+                const nextMonthTransactions = sortedFuture.filter(t => {
+                    const tDate = new Date(t.date);
+                    return tDate.getMonth() === nextMonth && tDate.getFullYear() === nextYear;
+                });
+                
+                let nextMonthDD = 0;
+                let nextMonthLiving = 0;
+                let nextMonthServices = 0;
+                
+                nextMonthTransactions.forEach(t => {
+                    const category = categorizeTransaction(t.event, t.amount, t.comment, t.category);
+                    // Débit différé is identified by comment "DD", not category
+                    if (t.comment && t.comment.toUpperCase().includes('DD')) {
+                        nextMonthDD += t.amount;
+                    } else if (category === 'Living') {
+                        nextMonthLiving += t.amount;
+                    } else if (category === 'Services') {
+                        nextMonthServices += t.amount;
+                    }
+                });
+                
+                explanation += `- Next month's Débit différé: €${Math.abs(nextMonthDD).toFixed(2)}\n`;
+                explanation += `- Next month's Living: €${Math.abs(nextMonthLiving).toFixed(2)}\n`;
+                explanation += `- Next month's Services: €${Math.abs(nextMonthServices).toFixed(2)}\n`;
+                
+                const total = available + thisMonthSalary + nextMonthDD + nextMonthLiving + nextMonthServices;
+                explanation += `\n= €${total.toFixed(2)}\n\n`;
+                explanation += 'This is what you\'ll have for discretionary spending (Food, Pets, Other) next month.';
+            } else {
+                explanation += '\nNo Débit différé found for calculation.';
+            }
+            
+            alert(explanation);
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const day = date.getDate();
+            const month = date.toLocaleString('en', { month: 'short' });
+            return `${day} ${month}`;
+        }
+
+        init();
+    </script>
+</body>
+</html>
